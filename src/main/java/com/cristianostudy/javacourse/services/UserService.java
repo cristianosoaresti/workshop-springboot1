@@ -3,6 +3,8 @@ package com.cristianostudy.javacourse.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -43,9 +45,13 @@ public class UserService {
 	}
 
 	public User update(Long id, User user) {
-		User monitoryEntityByJPA = userRepository.getOne(id);
-		updateData(monitoryEntityByJPA, user);
-		return userRepository.save(monitoryEntityByJPA);
+		try {
+			User monitoryEntityByJPA = userRepository.getOne(id);
+			updateData(monitoryEntityByJPA, user);
+			return userRepository.save(monitoryEntityByJPA);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void updateData(User monitoryEntityByJPA, User user) {
